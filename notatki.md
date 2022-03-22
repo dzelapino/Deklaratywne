@@ -1,5 +1,10 @@
 # Deklaratywne
 
+```rkt
+input w konsoli: >
+output w konsoli: ->
+```
+
 ## wyklad 1
 
 nic
@@ -24,19 +29,23 @@ fa(x) := x^2 + a        (f a)(x) = x^2 + a
     (lambda (x) (+ (* x x) a))
 )
 
-|> (f 5)
-->    (lambda(x)(+ (*x x) 5))
+```rkt
+>  (f 5)
+-> (lambda(x)(+ (*x x) 5))
+```
 
-<!--^^tu bedzie blad^^-->  
+^^tu bedzie blad^^  
 
-|> ((f 5) 2)
-->    (lambda (x) (+ (*x x) 5) 2)
-->    (+ (* 2 2) 5)
-->    9
+```rkt
+>   ((f 5) 2)
+->  (lambda (x) (+ (*x x) 5) 2)
+->  (+ (* 2 2) 5)
+->  9
+```
 
-<!-- ^^tu mamy funkcje i argument do owej funkcji -->
+^^tu mamy funkcje i argument do owej funkcji^^
 
-<!-- pochodna -->
+pochodna
 Df(x) = f'(x)
 D f(x) = (f(x + dx) - f(x)) /dx
 
@@ -49,29 +58,40 @@ D f(x) = (f(x + dx) - f(x)) /dx
 (define (cube x)
   (* x x x))
 
-|> ((derive cube 0.001) 5)
+```rkt
+>  ((derive cube 0.001) 5)
 -> 75.015
+```
 
 ### listy
 
 cons, car, cdr
 
-|> (cons 1 2)
-->   (1 . 2)
-|> (car (1 . 2))
+```rkt
+> (cons 1 2)
+-> (1 . 2)
+
+> (car (1 . 2))
 -> 1
-|> (cdr (1 . 2))
+
+> (cdr (1 . 2))
 -> 2
-|> (cons 1 (cons 2 (cons 3 '())))
+
+> (cons 1 (cons 2 (cons 3 '())))
 -> (1 2 3)              (1 . (2 . (3 . '())))
-|> (list 1 2 3)
+
+> (list 1 2 3)
 -> (1 2 3)
-|> (car '(1 2 3))
+
+> (car '(1 2 3))
 -> 1
-|> (cdr '(1 2 3))
+
+> (cdr '(1 2 3))
 -> (2 3)
-|> (list 1 (cons 2 3) 7)
+
+> (list 1 (cons 2 3) 7)
 -> (1 (2 . 3) 7)
+```
 
 (define (length e)
   (if (null? e)
@@ -80,22 +100,34 @@ cons, car, cdr
   )
 )
 
-|> (length (1 2 3))
+```rkt
+> (length (1 2 3))
 -> 3
-<!-- z to ta tablica z gory  (list 1 (cons 2 3) 7) o ta i te pare bierze jako 1-->
-|> (length z)
+```
+
+z = (list 1 (cons 2 3) 7) pare ( 2 3 ) bierze jako 1 element
+
+```rkt
+> (length z)
 -> 3
-|> (length (list 1 2 3))
+
+> (length (list 1 2 3))
 -> 3
-<!-- tu bedzie myslal ze to jest funkcja -->
-|> (length (1 2 3))
-|> (length (a b c))
-<!--  dlatego trzeba napisac pypcia przed nawiasem i wtedy wie ze to lista -->
-|> (length '(1 2 3))
-|> (length '(a b c))
-<!-- pypcia mozna napisac slownie badz symbolem -->
-|> (quote (a b c))
+
+tu bedzie myslal ze to jest funkcja
+> (length (1 2 3))
+> (length (a b c))
+
+ dlatego trzeba napisac pypcia przed nawiasem i wtedy wie ze to lista
+
+> (length '(1 2 3))
+> (length '(a b c))
+
+pypcia mozna napisac slownie badz symbolem
+
+> (quote (a b c))
 -> (a b c)
+```
 
 (define (append e1 e2)
   (if (null? e1)
@@ -128,7 +160,10 @@ cons, car, cdr
   )
 )
 
-|> (member? 'a '(a b c a))
+```rkt
+> (member? 'a '(a b c a))
 -> #t
-|> (member? 'a '(b (a b a) c))
+
+> (member? 'a '(b (a b a) c))
 -> #f
+```
