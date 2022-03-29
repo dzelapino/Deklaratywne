@@ -169,3 +169,237 @@ pypcia mozna napisac slownie badz symbolem
 > (member? 'a '(b (a b a) c))
 -> #f
 ```
+
+## wyklad 4
+
+### drzewa binarne
+
+Puste drzewo:
+
+```rkt
+'()
+```
+
+Drzewo:
+
+```rkt
+        (x)
+      /     \
+    (l)     (t)
+```
+
+'(x l r)
+
+```rkt
+        (2)
+      /     \
+    (3)     (1)
+   /   \    / \
+ ()   (4) ()   ()
+      / \
+     ()  ()
+```
+
+'(2 (3 () (4 () () ) ) (1 () () ) )
+
+```rkt
+  (define (height t)
+
+      (if (eq? t '())
+        0
+        (+ 1 (max (height (car (cdr t)))
+                        (height (car (cdr (cdr t))))
+        ))
+      )
+
+  )
+```
+
+skrocone formy zapisu:
+
+(car (cdr (cdr t))) -> (caddr t)
+
+(car (cdr t)) -> (cadr t)
+
+```rkt
+(define (left t)
+
+  (cadr t)
+
+)
+
+(define (right t)
+
+  (caddr t)
+
+)
+
+(define (is-null? t)
+
+  (eq? t '())
+)
+
+```
+
+```rkt
+(define (height t)
+
+  (if (is-null? t)
+    0
+    (+ 1 (max (height (left t))
+                    (height (right t))
+    ))
+  )
+
+)
+```
+
+```rkt
+(define (element t) (car t))
+```
+
+Kolejnosc prefikoswa: od lewych do prawych
+
+```rkt
+        (2)
+      /     \
+    (3)     (1)
+   /   \    / \
+ ()   (4) ()   ()
+      / \
+     ()  ()
+```
+
+`(2 3 4 1)
+
+```rkt
+(define (preorder t)
+
+  (if (is-null? t)
+    '()
+  (con (element t)
+   (append (preorder (left t))
+    (preorder(right t))))
+
+  )
+
+)
+```
+
+```rkt
+        (2)
+      /     \
+    (3)     (1)
+   /   \    / \
+ ()   (4) ()   ()
+      / \
+     ()  ()
+
+-wymnazamy przez 5-
+
+        (10)
+      /     \
+    (15)     (5)
+   /   \    / \
+ ()   (20) ()   ()
+      / \
+     ()  ()
+
+(define (times n t)
+
+  (if (is-null? t )
+    '()
+   (make-tree (* n (element t))
+    (times n (left t))
+    (times n (right t)))
+
+  )
+)
+
+(define (make-tree root left right)
+
+  (list root left right)
+
+)
+```
+
+### symboliczne pochodne
+
+```txt
+dc/dx = 0, c stała lub c = y != x
+
+dx/dx = 1
+
+d(u + v)/dx = du/dx + dv/dx
+
+d(u * v)/dx = v * du/dx  + u * dv/dv
+```
+
+```rkt
+(define (derive exp var)
+
+  (cond ((constant? exp) 0)
+      ((variable? exp)
+        (if (same-variable? exp var) 1 0))
+      ((sum? exp)
+        (make-sum  (derive (addend exp) var)
+                    (derive (augment exp) var)))
+      ((pred? exp)
+        (make-sum (make-product ....)
+                        (make-product ....)))
+    )
+  )
+```
+
+#### reprezentacja wyrazen
+
+```txt
+a * x + b
+
+a * x * y + b * x
+```
+
+```rkt
+'(+ (* a x) b)
+
+(define (constant? exp) (number? exp))
+
+(define (variable? exp) (symbol? exp))
+
+(define (same-variables? x y)
+  (and (eq? x y)
+  (variable? x) (variable? y))
+)
+
+(define (sum? exp)
+  (if (list? exp)
+      (eq? (car exp) '+)
+      (error "......."))
+)
+
+(define (addend exp)
+  (cadr exp)
+)
+
+(define (augment exp)
+  (caddr exp)
+)
+
+(define (make-sum x y)
+  (list '+ x y)
+)
+```
+
+```rkt
+>   (derive '(+ (* a x) b) 'x)
+->  ( + ( + ( * a 1) (* x 0)) 0 )
+
+>   (derive '(x * y) 'x)
+->  (+ (* x 0) (* 1 y))
+```
+
+```txt
+d(x * y')/dx = y * dx/dx + x * dy/dx
+
+(+ (* y 1) .... )
+```
