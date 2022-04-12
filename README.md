@@ -403,3 +403,256 @@ d(x * y')/dx = y * dx/dx + x * dy/dx
 
 (+ (* y 1) .... )
 ```
+
+## wyklad 5
+
+### list comprehension
+
+sumowanie wszystkich elementow w liscie
+(define (sum l)
+
+  (if (null? l)
+    0
+    (+ (car l) (sum  (cdr l)))
+  )
+
+)
+
+mnozenie wszystkich elementow w liscie
+
+(define (prod l)
+
+  (if (null? l)
+    1
+    (* (car l) (prod  (cdr l)))
+  )
+
+)
+
+(define (fold f e l)
+
+  (if (null? l)
+    e
+    (f (car l) (fold f e (cdr l)))
+  )
+
+)
+
+e mowi nam co zadzieje sie w wypadku gdy lista bedzie pusta
+f jest argumentem funkcyjnym
+
+```rkt
+> (fold + 0 '(1 2 3 4))
+-> 10
+
+> (fold * 1 '(1 2 3 4))
+-> 24
+
+> (fold * 3 '(1 2 3 4))
+-> 72
+```
+
+(define (sum l) (fold + 0 l))
+(define (frod l) (fold * 1 l))
+
+Append uzywajac fold
+(define (fold cons l1 l2)
+
+(if (null? l2)
+    l1
+    (cons (car l2) (fold cons l1 (cdr l2)))
+  )
+
+)
+
+Szalony sposob na uzycie folda z lambda
+
+```rkt
+(define (fold f e)
+
+  (lambda (l)
+  
+    (if (null? l)
+    
+      e
+      (f (car l)((fold f e)(cdr l)))
+    
+    )
+
+  )
+
+)
+```
+
+```rkt
+> ((fold + 0) '(1 2 3 4))
+-> 10
+> ((fold * 1) '(1 2 3 4))
+-> 24
+```
+
+### rozdział o tym czym są dane?
+
+#### liczby zespolone
+
+ogolny schemat sumowania i mnozenia liczb zespolonych
+
+```rkt
+(define (+c z1 z2)
+
+    (make-rectangular
+    
+      (+ (real-part z1) (real-part z2))
+      (+ (imag-part z1) (imag-part z2))
+    
+    )
+
+)
+
+(define (-c z1 z2)
+
+    (make-rectangular
+    
+      (- (real-part z1) (real-part z2))
+      (- (imag-part z1) (imag-part z2))
+    
+    )
+
+)
+
+(define (*c z1 z2)
+
+  (make-polar
+  
+    (* (magnitude z1) (magnitude z2))
+    (+ (angle z1) (angle z2))
+  
+  )
+
+)
+
+(define (/c z1 z2)
+
+  (make-polar
+  
+    (/ (magnitude z1) (magnitude z2))
+    (- (angle z1) (angle z2))
+  
+  )
+
+)
+```
+
+Manifest types <=> Informacja o reprezentacji
+(rectangular. (1. 5))
+(polar. (7. 3))
+
+(define (attach-type type contents) (cons type contents))
+
+(define (type datum) (car datum))
+
+(define (contents datum) (cdr datum))
+
+(define (rectangular?) (eq? (type z) 'rectangular))
+
+(define (polar?) (eq? (type z) 'polar))
+
+(define (make-rectangular x y)
+  (attach-type 'rectangular (cons x y))
+)
+
+(define (make-polar x y)
+  (attach-type 'polar (cons x y))
+)
+
+(define (real-part z)
+  (cond (
+    (rectangular? z)
+      (real-part-rectangular (contents z))
+  )
+    ((polar? z)
+      (real-part-polar (contents z))
+    )
+  )
+)
+
+(define (imag-part z)
+  (cond (
+    (rectangular? z)
+      (imag-part-rectangular (contents z))
+  )
+    ((polar? z)
+      (imag-part-polar (contents z))
+    )
+  )
+)
+
+(define (magnitude z)
+  (cond ((rectangular? z)
+    (magnitude-rectangular (contents z)))
+  ((polar? z)
+    (magnitude-polar (contents z)))
+  )
+)
+
+(define (angle z)
+    (cond ((rectangular? z)
+  (angle-rectangular (contents z)))
+    ((polar? z)
+  (angle-polar (contents z))))
+)
+
+(define (real-part-rectangular z) (car z))
+
+(define (imag-part-rectangular z) (cdr z))
+
+(define (magnitude-rectangular z)
+  (sqrt (+ (square (car z)) (square (cdr z)))))
+
+```rkt
+(define (make-rectangular x y)
+  (define (dispatch m)
+    (cond ((eq? m 'real-part) x)
+      ((eq ? q 'imag-part) y)
+      ((eq? m 'magnitude) (sqrt (+ (square x) (square y))))
+      ((eq? m 'angle) (atan y x))
+      (else (error "Unknown message in make-rectangular: " m)))))
+
+(define (make-polar x y)
+  (define (dispatch m)
+    (cond ((eq? m 'real-part) (* x (cos y)))
+      ((eq ? q 'imag-part) (* x (sin y)))
+      ((eq? m 'magnitude) x)
+      ((eq? m 'angle) y)
+      (else (error "Unknown message in make-rectangular: " m)))))
+
+(define (real-part obj) (obj 'real-part))
+(define (imag-part obj) (obj 'imag-part))
+(define (magnitude obj) (obj 'magnitude))
+(define (angle obj) (obj 'angle))
+```
+
+#### Pary
+
+```txt
+[ ][ ]
+ |  |
+ v  v
+ x y
+```
+
+Definicja par
+(car (cons x y)) = x
+(cdr (cons x y)) = y
+(cons (car z) (cdr z)) = z
+
+(define (new-cons x y)
+  (define (dispatch m)
+    (cond ((= m 0) x)
+      ((= m 1) y)
+      (else (error "..."))))
+    dispatch)
+
+(define (new-car z) (z 0))
+(define (new-cdr z) (z 1))
+
