@@ -778,9 +778,9 @@ Przykład: konto
 
 (define (withdraw ammount)
   (if (=> balance ammount)
-    (begin (set! balance (- balance ammount)))
+    (begin (set! balance (- balance ammount))
        balance)
-    (error "za malo $$$"))
+    (error "za malo $$$")))
 
 
 (define (make-withdraw balance)
