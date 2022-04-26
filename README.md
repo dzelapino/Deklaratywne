@@ -9,11 +9,94 @@ output w konsoli: ->
 
 ## wyklad 1
 
-to jest taki jezyk
+```s
+(define (nwd x y)
+  (if (= x y)
+      x
+      (if (> x y)
+          (nwd (- x y) y)
+      (nwd x (- y x)))))
+
+#|(nwd 30 20)|#
+
+(define (nww x y)
+  (if (/ (* x y) (nwd x y))
+      (/ (* x y) (nwd x y))
+      1))
+
+(nww 12 32)
+
+(define (new.> x y)
+  (> x y))
+
+(define (new.< x y)
+  (< x y))
+
+(define (new.= x y)
+  (not (or (> x y) (> y x))))
+
+(define (new.<> x y)
+  (or (> x y) (> y x)))
+
+(define (new.<= x y)
+  (not (> x y)))
+
+(define (new.>= x y)
+  (not (< x y)))
+
+(define (same-values? p1 p2 x y)
+  (if (equal? (p1 x y) (p2 x y))
+  #t
+  #f)
+)
+
+(same-values? new.<= < 6 4)
+```
 
 ## wyklad 2
 
-rekurencja robi brr
+### silnia
+
+```s
+(define (factorialRecursive x)
+  (if (= x 0)
+  1
+  (* x (factorialRecursive(- x 1)))))
+
+(factorialRecursive 3)
+
+(define (factorialAcc x)
+  (define (factorialHelper x acc)
+    (if (> x 1)
+    (factorialHelper (- x 1) (* acc x))
+    acc))
+    (factorialHelper x 1)
+)
+
+(factorialAcc 3)
+```
+
+### ciag bonifacego
+
+```s
+(define (bonifacy x)
+(if (not (> x 1))
+x
+(+ (bonifacy (- x 1)) (bonifacy (- x 2)))))
+
+(bonifacy 10)
+
+(define (bonifacyAcc x)
+  (define (bonifacyHelper x c1 c2)
+    (cond ((= x 0) c1)
+          ((= x 1) c2)
+          (else (bonifacyHelper (- x 1) c2 (+ c1 c2))))
+  )
+  (bonifacyHelper x 0 1)
+)
+
+(bonifacyAcc 10)
+```
 
 ## wyklad 3
 
@@ -655,4 +738,73 @@ Definicja par
 
 (define (new-car z) (z 0))
 (define (new-cdr z) (z 1))
+
+## wyklad 6
+
+### kolejki
+
+```txt
+<----- [ 2 | 3 | .... ] <----
+
+pop(q) = [3 | ...]
+push(7) = [2 | 3 | .... | 7 ]
+top(q) = 2
+
+pop(q)  = [3 | ...]
+pop(q)  = [3 | ...]
+
+nie mamy wymodelowanej histori wiec usunieta zostala znowu 2
+
+```
+
+w scheme
+
+```s
+
+(set! x w)
+
+```
+
+Przykład: konto
+
+```s
+
+> (withdraw 30)
+-> 70
+> (withdraw 30)
+-> 40
+
+(define balance 100)
+
+(define (withdraw ammount)
+  (if (=> balance ammount)
+    (begin (set! balance (- balance ammount)))
+       balance)
+    (error "za malo $$$"))
+
+
+(define (make-withdraw balance)
+  (define (dispatch ammount)
+    (if (>= ....)
+      .
+      .
+      .
+    ))
+  dispatch)
+```
+
+### rozszerzenie modelu ewaluacji (model srodowisk)
+
+zeby ewaluowac funkcje f,  stworzymy nowe srodowisko, w ktorym wartosci formalne parametrow sa aktualnymi parametrami
+
+Nastepca srodowiska
+jest to srodowisko w ktorym nasza funkcja f zostala zdefiniowana, to co zostaje w nowym srodowisku ewaluujemy cialo funkcji f
+
+```s
+> (square (square 3))
+-> (square 9)
+-> 81
+```
+
+rysunki z tego sa na jego stronie: <https://inf.ug.edu.pl/~schwarzw/ProgDekl-Rozd5.pdf>
 
