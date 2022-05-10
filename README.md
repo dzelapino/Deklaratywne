@@ -808,3 +808,117 @@ jest to srodowisko w ktorym nasza funkcja f zostala zdefiniowana, to co zostaje 
 
 rysunki z tego sa na jego stronie: <https://inf.ug.edu.pl/~schwarzw/ProgDekl-Rozd5.pdf>
 
+## wyklad 7
+
+### rozszerzenie modelu ewaluacji (model srodowisk) cd
+
+rysunki z tego sa na jego stronie: <https://inf.ug.edu.pl/~schwarzw/ProgDekl-Rozd5.pdf>
+Strona 7
+
+### Znów o listach
+
+```scheme
+(set-car! l w)
+(set-cdr! l w)
+```
+
+lub
+
+```scheme
+(set-mcar l w)
+(set-mcdr! l w)
+```
+
+m oznacza mutable
+
+```scheme
+(set-car! l
+  (cons .1 (cons2'())))
+```
+
+powyzsza zmiana nie zadziala poniewaz probujemy zmienic liste z funkcja destruktywna
+
+```scheme
+(set-mcar! (mcons 1 (mcons 2'())) 3)
+```
+
+ten zapis juz bedzie gitowa i wtedy car zmieni nam sie w 3
+m musimy uzywac dla list ktore chcemy mutowac podczas trwania programu
+
+Przykład:
+
+```scheme
+(define x '((a b) c d)) 
+```
+
+lista powinna być zdefiniowana z mcons zamiast z pypciem
+
+```scheme
+(define x (mcons (mcons a b) c d)) 
+(define y (mcons e f))
+
+(set-car! x y)
+> x
+-> '((e f) c d)
+
+> (set-cdr! y y)
+> (length y)
+po tym sie powinno wysypac
+
+> (length x)
+-> 3
+dla x length idzie przez glowna strukture
+natomiast dla y robi sie petla poniewaz y to ogon i jako ogon ogona ustawiamy ten sam ogon i znowu jego ogonem jest ten sam ogon itd
+```
+
+### kolejki cd
+
+```scheme
+(make-queue)
+(empty-queue? q)
+(first q)
+(insert-queue! q e)
+(delete-queue! q)
+```
+
+przykladowa kolejka:
+
+```txt
+q->[   | --]---------------| rear-ptr
+      | front-ptr             |
+    [   |  -]-> [    |  -]-> [    |  / ]
+      |             |              |
+      3            4              5
+```
+
+```scheme
+(define (make-queue) (mcons '() '()))
+(define (empty-queue? q) (null? (car q)))
+(define (front-ptr q) (mcar q))
+(define (set-front-ptr! q i) (set-mcar! q i))
+```
+
+dodawanie goscia do kolejki
+
+```txt
+q->[   | --]---------------| rear-ptr --|
+      | front-ptr             |                  |
+    [   |  -]-> [    |  -]-> [    |  -]->       [   | / ]
+      |             |              |                   |
+      3            4              5                  e
+```
+
+```scheme
+(define (insert-queue! q e)
+    (let ((new (mcons e '())))
+        (if (empty-queue? q)
+            (begin (set-front-ptr! q new)
+                        (set-rear-ptr! q new)
+            )
+            (begin (set-mcdr! (rear-ptr q) new)
+                        (set-rear-ptr! q new)
+            )
+        )
+    )
+)
+```
