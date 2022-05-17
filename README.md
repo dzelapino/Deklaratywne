@@ -922,3 +922,149 @@ q->[   | --]---------------| rear-ptr --|
     )
 )
 ```
+
+## wyklad 8
+
+### Predykaty
+
+Predykat length
+
+```prolog
+
+length(L, N) <=>
+  dlugosc listy L jest N
+
+length([], 0).
+length([X | L], N) :- 
+  length(L,M), N = M + 1.
+ N jest długoscia L + 1
+
+```
+
+Interpretacja deklaratywna:
+  k :- B1 , ...... , Bn  (n >= 0)
+
+k bedzie spelnione, jezeli wszystkie Bi są spelnione
+(B1 ^ ...... ^ Bn) => K    ^ - implikacja
+
+Interpretacja procedularna:
+  żeby pokazać K - pokaz B1, .... , Bn
+
+```prolog
+
+?-length([1,2],2).
+        | x = 1, L = [2], N = 2
+    length([2], M), 2 = M + 1.
+        | x' = 2, L' = [], M = N'
+    length([], M'), N' = M' + 1, 2 = M + 1
+        | M' = 0
+    N' = 0 + 1, 2 = M + 1
+        | N' = 1
+    2 = M + 1
+        | M = 1
+        [] - kwadracik to pusty zbior warunkow do spelnienia
+
+
+
+?-length([1,2], 1).
+        | x = 1, L = [2], N = 1
+    length([2], M), 1 = M + 1.
+        |
+        .
+        .
+        .
+        |
+    M = 0 + 1, 1 = M + 1
+        | M = 1
+    1 = 1 + 1
+        |
+    falsh
+
+```
+
+Prolog sprawdza czy predykat jest "spelniony".
+Czyli odpowiada "richtig" lub "falsh".
+
+```prolog
+
+length([1,2], N).
+        | X = 1, L = [2]
+    length([2], M), N = M + 1.
+        | 
+        .
+        . M = 1
+    N = 1 + 1
+        | N = 2
+       [ ]
+
+N = 2
+
+```
+
+### Wprowadzenie do prolog
+
+* predykaty:
+    uzywaja obiektow i opisuja relacje pomiedzy tymi projektami
+* fakty, reguly, pytania
+
+fakty:
+    predykat parent(tom, bob).  ma byc spelniony bezwarunkowo
+
+```txt
+    pam             tom
+        \          /        \
+            bob             friz
+        /        \
+    am       mini majk
+                        |  
+                       jim
+```
+
+parent(tom, bob).
+parent(tom, friz).
+parent(pam, bob).
+
+Pytania (querries)
+
+```prolog
+?-parent(tom, friz)
+    true
+?-parent(friz, tom).
+    false
+?-parent(bob,X).
+    X = am      prolog odpowiada dla kogo predykat jest spelniony
+    X = am ;    uzywajac srednika zadamy wiecej
+    X = mini majk;
+    false       false poniewaz nie ma dalszych mozliwosci
+
+
+?-parent(Y, jim), parent (X, Y).
+        | Y = mini majk
+    parent(X, mini majk)
+        | X = bob
+       [ ]
+    Y = mini majk, X = bob
+```
+
+Reguly:
+    matka(pam, bob).
+    ojciec(bob, am).
+        .
+        .
+        .
+    lipka rozwiazanie bo dziala tylko dla tycich baz
+
+```prolog
+male(bob).
+female(pam).
+
+matka(X,Y) :- parent(X,Y), female(X).
+
+grandparent(X,Y) :- parent(X,Z), parent(Z,Y).
+
+predecessors(X,Y) :- parent(X, Y).
+predecessors(X,Y) :-
+    predecessors(Z, Y), predecessor(X,Z).
+
+?-predecessors(pam, bob).
+```
