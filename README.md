@@ -1068,3 +1068,44 @@ predecessors(X,Y) :-
 
 ?-predecessors(pam, bob).
 ```
+
+## wyklad 9
+
+### rezolucja
+
+```prolog
+pre(X,Y) :- parent(X,Y)     R1
+pre(X,Y) :- parent(X,Z), pre(Z,Y)     R2
+parent(tom,liz)     F1
+parent(tom,bob)     F2
+parent(tom,pat)     F3
+
+?- pre(tom, pat)
+
+1. parent(bob,pat)  F3
+2. parent(bob,pat)  R1(1.)
+3. parent(bob,pat)  F2
+4. parent(bob,pat)  R2(3., 2.)
+
+to jest forward reasoning, wszystko wygenerowane w ten sposob jest poprawne i konsekwencja naszego programu
+
+backward reasoning jest lepszy, stosujemy powyzsze reguly od tylu
+
+pre(tom, pat)
+    | R2
+parent(tom, bob), pre(bob, pat)
+     F2 spelnione               |
+                            parent(bob, pat)
+                                F3 spelnione
+```
+
+### listy w prologu
+
+```prolog
+[]
+[ | ]
+[1 | [2 | [a | []]]] - [1,2,a]
+
+append([], L, L)
+append([X | L1] , L2, [X | L3]) :- append(L1,L2,L3) 
+```
