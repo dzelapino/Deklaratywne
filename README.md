@@ -1109,3 +1109,160 @@ parent(tom, bob), pre(bob, pat)
 append([], L, L)
 append([X | L1] , L2, [X | L3]) :- append(L1,L2,L3) 
 ```
+
+## wyklad 10
+
+### ciag dalszy o listach
+
+```prolog
+append([],L,L)
+append([X|L1], L2, [X|L3]) :- append(L1,L2,L3)
+
+?- append([1],[2,3],[1,2])
+False
+
+?- append([1], [Y], [1,2])
+| X = 1, L1 = [], L2 = [Y], L3 = [2]
+append([], [Y], [2])
+| L = [Y], L = [2] ~> Y = 2         ~> oznacza jeżeli Y musi byc 2 zeby otrzymac true
+Y = 2 []
+
+member(X, [X|L])
+member(X, [Y|L]) :- member(X,L)     x jest w liscie jesli wystepuje w ogonie
+?-member(X,[1,2,3])
+  X = 1 ;
+  X = 2 ;
+  X = 3 ;
+  false
+
+member2(X,L) :- append(L1, [X|L2], L)
+```
+
+### Arytmetyka
+
+```prolog
+length([], 0)
+length([X|L], N):- length(L,M), N = M + 1
+
+?- length([1,2,3], N)
+N = ((0+1)+1)+1
+
+?- N = 0 + 1
+N = 0 + 1
+
+?- N is 0 + 1
+N = 1
+
+dlatego lepiej pisac
+
+length([], 0)
+length([X|L], N):- length(L,M), N is M + 1
+
+?- length([1,2,3], N)
+N = 3
+
+?- X = Y + 1
+X = Y + 1
+
+?- X is Y + 1 spowoduje blad
+
+?- Y = 5, X is Y + 1 jest gituwa
+Y = 5, X = 6
+
+?- 4 is 2 + 1
+False
+
+```
+
+### Termy
+
+(i) proste - stały (1,2,3, ..., tom, a , ....) wszystko co zaczyna sie z malej litery
+                - zmienne (X, L, Fred, Andrzej, ...) wszystko co zaczyna sie od wielkiej litery
+
+(ii) struktularne
+  [X | L], [1 | X], 0 + y, 2 * 3, ...
+  [ [X | L] | [] ], ... , (0 + y) + 0
+  f(1,2), parent(tom, bob)
+
+```prolog
+date(1, may, 1999)
+?- date(X, may, 1999)
+X = 1
+```
+
+#### Przyklad: Listy
+
+pusta lista       | nil
+niepusta lista  | date(X, L)
+
+```prolog
+cons(1, nil)
+cons(2, cons(1, nil))
+
+length(nil, 0)
+length(cons(X,L), N):- length(L,M), N is M + 1
+
+?- length([1,2,3], N)
+False   [1|[2|[3|[]]]]
+
+?-length(cons(1,cons(2,cons(3,nil)), N), N)
+| X = 1, L = cons(2,cons(3,nil))
+.
+.
+.
+```
+
+#### Przyklad: Figury geometryczne
+
+```prolog
+point(1,1),
+point(2,3).
+seg(point(1,1), point(2,3)).
+
+triangle(point(4,2), point(6,4), point(7,1)).
+
+?- triangle(X, point(X1,X2), point(7,1)).
+  | X = point(4,2), X1 = 6, X2 = 4
+ [ ]
+
+nie wiem czy to seg czy seq XD
+
+vertcal(seg(point(X, Y1), point(X, Y2))).
+horizontal(seg(point(X1,Y), point(X2, Y)))
+
+?- vertical(seg(point(1,7), point(1,8))).
+
+o jednak seg od segmentu
+
+?- vertical(S), horizontal(S)
+  | S = seg(point(X, Y1), point(X, Y2))
+horizontal(seg(point(X,Y1), point(X, Y2)))
+  | X = X1, Y1 = Y, X = X2, Y2 = Y
+ [ ]
+```
+
+nil
+drzewo(X, L, R)
+leaf(X)
+
+```prolog
+height(nil, 0)
+height(drzewo(X,L,R), N) :- 
+  height(L, N1),
+  height(R, N2),
+  N1 <= N2, N is N2 + 1
+
+height(drzewo(X,L,R), N) :-
+  height(L,N1),
+  height(R,N2),
+  N1 >= N2, N is N1 + 1
+
+poprawna wersja
+
+height(drzewo(X,L,R), N) :-
+  height(L,N1),
+  height(R,N2),
+  (N1 >= N2, N is N1+1) ; (N1 < N2, N is N2 + 1).
+
+  max(N1,N2,N3) ; N is N3 + 1     to jakby bylo wiecej niz 2
+```
