@@ -1266,3 +1266,80 @@ height(drzewo(X,L,R), N) :-
 
   max(N1,N2,N3) ; N is N3 + 1     to jakby bylo wiecej niz 2
 ```
+
+## Wyklad 11
+
+### Drzewa binarne
+
+```prolog
+nil
+drzewo(X,L,R)
+
+sum(nil, 0).
+sum(drzewo(X,L,R), N) :- 
+  sum(L,N1), sum(R, N2), N is X + N1 + N2
+
+sum(drzewo(S, drzewa(7,nil,nil), nil), N)
+| X = 5, L = drzewo(7, nil, nil), R = nil
+sum(drzewo(7, nil, nil), N1), sum(nil, N2), N = 5 + N1 + N2
+
+times(N, nil, nil).
+times(N, drzewo(X1,L1,R1), drzewo(X2,L2,R2)) :- X2 is X1*N, times(N,L1,L2).
+
+times(5, drzewo(3, drzewo(4,nil,nil),
+  drzewo(1,nil, drzewo(7,nil,nil))), D)
+| N = 5, X1 = 3,
+| L1 = drzewo(4,nil,nil)
+| R1 = drzewo(1, nil, drzewo(7, nil, nil))
+| D = drzewo(X2,L2,R2)
+X2 is 3 * 5, times(5, drzewo(4,nil,nil), L2),
+  times(5, drzewo(1, nil, drzewo(7, nil, nil)), R2).
+| X2 = 15
+| N' = 5
+| X1' = 4, L1' = nil, R1' = nil
+| L2 = drzewo(X2', L2', R2')
+| X2' is 4 * 5, times(5, nil, L2'), times(5, nil, R2').
+times(5, drzewo(1,nil,drzewo(7, nil, nil)), R2)
+| X2' = 20, L2' = nil, R2' = nil
+times(5,drzewo(1,nil,drzewo(7, nil, nil)), R2)
+
+
+D = drzewo(X2,L2,R2)
+nastepnie ->
+D = drzewo(15, L2, R2)
+nastepnie ->
+D = drzewo(15, drzewo(20, L2', R2'), R2)
+nastepnie ->
+D = drzewo(15, drzewo(20, nil, nil), R2)
+times(N, drzewo(X1,L1,R1), drzewo(X2,L2,R2)) 
+```
+
+### Cut, po prostu cut xD i Negacja
+
+Cut pisze sie jako ! służy do tego aby zmodyfikować odpowiedź
+
+```prolog
+f(X,0) :- X < 3.
+f(X,2) :- 3 <= X < 6.
+f(X, 4) :- 6 <= X.
+
+?- f(1,Y), 2 < Y.
+false poniewaz Y wynosi zero (pierwsza regula, X = 1, Y = 0)
+prolog robi wzium do drugiej reguly
+false poniewaz X wynosi 1 a musi byc <= 3 (druga regula X = 1, Y = 2)
+prolog robi wzium do trzeciej reguly
+false poniewaz X wynosi 1 a musi byc wiekszy rowny od 6 (trzecia regua X = 1, Y = 4)
+ostatecznie prolog odpowiada false
+
+uzywajac Cut:
+f(X,0) :- X < 3, !.
+f(X,2) :- 3 <= X < 6, !.
+f(X, 4) :- 6 <= X.
+
+prolog eliminuje 2 nastepne czesci kiedy natrafia na false w pierwszej regule
+wiec wykonuje tylko 1 regule, nie sprawdzajac drugiej i trzeciej
+```
+
+w literaturze instnieja: green Cut i czerwony Cut
+green jest fajowy i luzny
+czerwone sa niebezpieczne poniewaz zmieniaja wynik eliminujac nastepne czesci
